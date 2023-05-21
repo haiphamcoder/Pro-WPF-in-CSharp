@@ -6,6 +6,6 @@ Không chắc là bạn sẽ viết XAML bằng tay. Thay vào đó, bạn sẽ 
 
 Chương này trình bày giới thiệu chi tiết về XAML. Bạn sẽ xem xét mục đích của nó, kiến trúc tổng thể và cú pháp của nó. Khi bạn hiểu các quy tắc rộng của XAML, bạn sẽ biết những gì có thể và không thể trong giao diện người dùng WPF và cách thực hiện thay đổi bằng tay khi cần thiết. Quan trọng hơn, bằng cách khám phá các thẻ trong tài liệu WPF XAML, bạn có thể tìm hiểu một chút về mô hình đối tượng làm nền tảng cho giao diện người dùng WPF và sẵn sàng cho việc khám phá sâu hơn sắp tới.
 
-## Hiều về XAML
+## Hiểu về XAML
 
 Các nhà phát triển đã nhận ra từ lâu rằng cách hiệu quả nhất để giải quyết các ứng dụng phức tạp, giàu đồ họa là tách phần đồ họa khỏi mã cơ bản. Bằng cách đó, các nghệ sĩ có thể sở hữu đồ họa và các nhà phát triển có thể sở hữu mã. Cả hai phần có thể được thiết kế và tinh chỉnh riêng biệt, mà không phải đau đầu về phiên bản.
