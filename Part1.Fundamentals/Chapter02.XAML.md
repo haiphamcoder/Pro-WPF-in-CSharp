@@ -214,6 +214,7 @@ Bây giờ, bạn sẽ có hiểu biết cơ bản về cách diễn giải tài
 Cho đến nay, bạn đã xem xét một ví dụ tương đối không thú vị — một cửa sổ trống lưu trữ điều khiển Lưới trống. Trước khi đi xa hơn, bạn nên giới thiệu một cửa sổ thực tế hơn bao gồm một số điều khiển. Hình 2-1 cho thấy một ví dụ với người trả lời câu hỏi tự động.
 
 ![Figure2-1](Figure2-1.png)
+
 Figure 2-1. Ask the eight ball, and all will be revealed
 
 Cửa sổ tám bóng bao gồm bốn điều khiển: Grid (công cụ phổ biến nhất để sắp xếp bố cục trong WPF), hai đối tượng TextBox và một Button. Đánh dấu cần thiết để sắp xếp và định cấu hình các điều khiển này dài hơn đáng kể so với các ví dụ trước. Dưới đây là danh sách viết tắt thay thế một số chi tiết bằng dấu chấm lửng (...) để hiển thị cấu trúc tổng thể:
