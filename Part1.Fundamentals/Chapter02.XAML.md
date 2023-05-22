@@ -249,3 +249,196 @@ Trong các phần sau, bạn sẽ khám phá các phần của tài liệu này 
 ■ Lưu ý: XAML không giới hạn các lớp là một phần của WPF. Bạn có thể sử dụng XAML để tạo một thể hiện của bất kỳ lớp nào đáp ứng một vài quy tắc cơ bản. Bạn sẽ học cách sử dụng các lớp của riêng mình với XAML ở phần sau của chương này.
 
 ### Thuộc tính đơn giản và bộ chuyển đổi loại
+
+Như bạn đã thấy, các thuộc tính của một phần tử đặt các thuộc tính của đối tượng tương ứng. Ví dụ: các hộp văn bản trong ví dụ tám bóng cấu hình căn chỉnh, lề và phông chữ:
+
+```xaml
+<TextBox Name="txtQuestion" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" FontFamily="Verdana" FontSize="24" Foreground="Green" ... >
+```
+
+Để điều này hoạt động, lớp System.Windows.Controls.TextBox phải cung cấp các thuộc tính sau: VerticalAlignment, HorizontalAlignment, FontFamily, FontSize và Foreground. Bạn sẽ tìm hiểu ý nghĩa cụ thể cho từng thuộc tính này trong các chương sau.
+
+Để hỗ trợ hệ thống này, trình phân tích cú pháp XAML cần thực hiện nhiều công việc hơn một chút so với những gì bạn có thể nhận ra ban đầu. Giá trị trong thuộc tính XML luôn là một chuỗi văn bản thuần túy. Tuy nhiên, thuộc tính đối tượng có thể là bất kỳ loại .Net nào.  Trong ví dụ trước, có hai thuộc tính sử dụng liệt kê (VerticalAlignment và HorizontalAlignment), một chuỗi (FontFamily), một số nguyên (FontSize) và một đối tượng Brush (Foreground).
+
+Để thu hẹp khoảng cách giữa các giá trị chuỗi và thuộc tính không chuỗi, trình phân tích cú pháp XAML cần thực hiện chuyển đổi. Việc chuyển đổi được thực hiện bởi các trình chuyển đổi loại, một phần cơ bản của cơ sở hạ tầng .NET đã tồn tại từ .NET 1.0.
+
+Về cơ bản, một bộ chuyển đổi kiểu có một vai trò trong cuộc sống — nó cung cấp các phương thức tiện ích có thể chuyển đổi một kiểu dữ liệu .NET cụ thể sang và từ bất kỳ loại .NET nào khác, chẳng hạn như biểu diễn chuỗi trong trường hợp này. Bộ phân tích cú pháp XAML sau hai bước để tìm bộ chuyển đổi kiểu:
+
+1. Nó kiểm tra khai báo thuộc tính, tìm kiếm một thuộc tính TypeConverter. (Nếu có, thuộc tính TypeConverter cho biết lớp nào có thể thực hiện chuyển đổi.) Ví dụ: khi bạn sử dụng một thuộc tính như Foreground, .NET sẽ kiểm tra khai báo của thuộc tính Foreground.
+2. Nếu không có thuộc tính TypeConverter trên khai báo thuộc tính, trình phân tích cú pháp XAML sẽ kiểm tra khai báo lớp của kiểu dữ liệu tương ứng. Ví dụ, thuộc tính Foreground sử dụng một đối tượng Brush. Lớp Brush (và các dẫn xuất của nó) sử dụng BrushConverter vì lớp Brush được trang trí bằng thuộc tính TypeConverter(typeof(BrushConverter)) declaration.converters
+
+Nếu không có bộ chuyển đổi kiểu liên kết trên khai báo thuộc tính hoặc khai báo lớp, trình phân tích cú pháp XAML sẽ tạo ra lỗi
+
+Hệ thống này đơn giản nhưng linh hoạt. Nếu bạn đặt bộ chuyển đổi kiểu ở cấp lớp, bộ chuyển đổi đó sẽ áp dụng cho mọi thuộc tính sử dụng lớp đó. Mặt khác, nếu bạn muốn tinh chỉnh cách thức hoạt động của chuyển đổi kiểu cho một thuộc tính cụ thể, bạn có thể sử dụng thuộc tính TypeConverter trên khai báo thuộc tính để thay thế.
+
+Về mặt kỹ thuật, có thể sử dụng bộ chuyển đổi kiểu trong mã, nhưng cú pháp hơi phức tạp. Hầu như luôn luôn tốt hơn để thiết lập một thuộc tính trực tiếp — nó không chỉ nhanh hơn mà còn tránh các lỗi tiềm ẩn do gõ sai chuỗi, sẽ không bị bắt cho đến thời gian chạy. (Sự cố này không ảnh hưởng đến XAML, vì XAML được phân tích cú pháp và xác nhận tại thời điểm biên dịch.) Tất nhiên, trước khi bạn có thể thiết lập các thuộc tính trên một phần tử WPF, bạn cần biết thêm một chút về các thuộc tính và kiểu dữ liệu WPF cơ bản — một công việc bạn sẽ giải quyết trong vài chương tiếp theo.
+
+■ Lưu ý: XAML, giống như tất cả các ngôn ngữ dựa trên XML, phân biệt chữ hoa chữ thường. Điều đó có nghĩa là bạn không thể thay thế \<button> cho \<Button>. Tuy nhiên, bộ chuyển đổi loại thường không phân biệt chữ hoa chữ thường, có nghĩa là cả Foreground = "White" và Foreground = "white" đều có cùng kết quả.
+
+### Tính chất phức tạp
+
+Tiện dụng như bộ chuyển đổi loại, chúng không thực tế cho tất cả các tình huống. Ví dụ: một số thuộc tính là các đối tượng chính thức với bộ thuộc tính riêng của chúng. Mặc dù có thể tạo biểu diễn chuỗi mà trình chuyển đổi kiểu có thể sử dụng, cú pháp đó có thể khó sử dụng và dễ bị lỗi.
+
+May mắn thay, XAML cung cấp một tùy chọn khác: cú pháp phần tử thuộc tính. Với cú pháp phần tử thuộc tính, bạn thêm phần tử con có tên trong biểu mẫu Parent.PropertyName. Ví dụ: Grid có thuộc tính Background cho phép bạn cung cấp cọ vẽ được sử dụng để vẽ khu vực phía sau các điều khiển. Nếu bạn muốn sử dụng một brush phức tạp — một cọ nâng cao hơn tô màu đồng nhất — bạn sẽ cần thêm thẻ con có tên Grid.Background, như được hiển thị ở đây:
+
+```xaml
+<Grid Name="grid1">
+    <Grid.Background>
+        ... 
+    </Grid.Background>
+    ...
+</Grid>
+```
+
+Chi tiết chính làm cho công việc này là dấu chấm (.) trong tên phần tử. Điều này phân biệt các thuộc tính với các loại nội dung lồng nhau khác.
+
+Điều này vẫn để lại một chi tiết — cụ thể là, sau khi bạn đã xác định thuộc tính phức tạp mà bạn muốn cấu hình, bạn đặt nó như thế nào? Đây là mẹo: bên trong phần tử lồng nhau, bạn có thể thêm một thẻ khác để khởi tạo một lớp cụ thể. Trong ví dụ tám quả bóng (thể hiện trong Hình 2-1), nền được lấp đầy bằng một gradient. Để xác định gradient bạn muốn, bạn cần tạo một đối tượng LinearGradientBrush.
+
+Sử dụng các quy tắc của XAML, bạn có thể tạo đối tượng LinearGradientBrush bằng cách sử dụng một phần tử có tên LinearGradientBrush
+
+```xaml
+<Grid Name="grid1">
+    <Grid.Background>
+        <LinearGradientBrush>
+        </LinearGradientBrush>
+    </Grid.Background>
+    ...
+</Grid>
+```
+
+Lớp LinearGradientBrush là một phần của tập hợp không gian tên WPF, vì vậy bạn có thể tiếp tục sử dụng không gian tên XML mặc định cho các thẻ của mình.
+
+Tuy nhiên, nó không đủ để chỉ đơn giản là tạo đối tượng LinearGradientBrush — bạn cũng cần chỉ định màu sắc trong gradient đó. Bạn thực hiện việc này bằng cách điền thuộc tính LinearGradientBrush.GradientStops với một bộ sưu tập các đối tượng GradientStop. Một lần nữa, thuộc tính GradientStops quá phức tạp để chỉ được đặt với một giá trị thuộc tính. Thay vào đó, bạn cần dựa vào cú pháp phần tử thuộc tính:
+
+```xaml
+<Grid Name="grid1">
+    <Grid.Background>
+        <LinearGradientBrush>
+            <LinearGradientBrush.GradientStops>
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+    </Grid.Background>
+    ...
+</Grid>
+```
+
+Cuối cùng, bạn có thể điền vào bộ sưu tập GradientStops với một loạt các đối tượng GradientStop. Mỗi đối tượng GradientStop có một thuộc tính Offset và Color. Bạn có thể cung cấp hai giá trị này bằng cú pháp thuộc tính thuộc tính thông thường:
+
+```xaml
+<Grid Name="grid1">
+    <Grid.Background>
+        <LinearGradientBrush>
+            <LinearGradientBrush.GradientStops>
+                <GradientStop Offset="0.00" Color="Red" />
+                <GradientStop Offset="0.50" Color="Indigo" />
+                <GradientStop Offset="1.00" Color="Violet" />
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+    </Grid.Background>
+    ...
+</Grid>
+```
+
+■ Lưu ý: Bạn có thể sử dụng cú pháp phần tử thuộc tính cho bất kỳ thuộc tính nào. Nhưng thông thường, bạn sẽ sử dụng phương pháp thuộc tính thuộc tính đơn giản hơn nếu thuộc tính có công cụ chuyển đổi loại phù hợp. Làm như vậy dẫn đến mã nhỏ gọn hơn.
+
+Bất kỳ bộ thẻ XAML nào cũng có thể được thay thế bằng một tập hợp các câu lệnh mã thực hiện cùng một tác vụ. Các thẻ được hiển thị trước đó, lấp đầy nền bằng gradient bạn chọn, tương đương với mã sau:
+
+```csharp
+LinearGradientBrush brush = new LinearGradientBrush();
+
+GradientStop gradientStop1 = new GradientStop();
+gradientStop1.Offset = 0;
+gradientStop1.Color = Colors.Red;
+brush.GradientStops.Add(gradientStop1);
+
+GradientStop gradientStop2 = new GradientStop();
+gradientStop2.Offset = 0.5;
+gradientStop2.Color = Colors.Indigo;
+brush.GradientStops.Add(gradientStop2);
+
+GradientStop gradientStop3 = new GradientStop();
+gradientStop3.Offset = 1;
+gradientStop3.Color = Colors.Violet;
+brush.GradientStops.Add(gradientStop3);
+
+grid1.Background = brush;
+```
+
+### Tiện ích mở rộng đánh dấu
+
+Đối với hầu hết các thuộc tính, cú pháp thuộc tính XAML hoạt động hoàn toàn tốt. Nhưng trong một số trường hợp, không thể mã hóa cứng giá trị tài sản. Ví dụ: bạn có thể muốn đặt giá trị thuộc tính cho một đối tượng đã tồn tại. Hoặc bạn có thể muốn đặt giá trị thuộc tính động bằng cách liên kết nó với một thuộc tính trong điều khiển khác. Trong cả hai trường hợp này, bạn cần sử dụng tiện ích đánh dấu—cú pháp chuyên biệt đặt thuộc tính theo cách không chuẩn
+
+Phần mở rộng đánh dấu có thể được sử dụng trong các thẻ lồng nhau hoặc trong các thuộc tính XML, phổ biến hơn. Khi chúng được sử dụng trong các thuộc tính, chúng luôn được ngoặc bằng dấu ngoặc nhọn {}. Ví dụ: đây là cách bạn có thể sử dụng, cho phép bạn tham chiếu đến một thuộc tính static trong một lớp khác:
+
+```xaml
+<Button ... Foreground="{x:Static SystemColors.ActiveCaptionBrush}" >
+```
+
+Phần mở rộng đánh dấu sử dụng cú pháp {MarkupExtensionClass Argument}. Trong trường hợp này, phần mở rộng markup là lớp StaticExtension. (Theo quy ước, bạn có thể bỏ từ cuối cùng Extension khi đề cập đến một lớp mở rộng.) Tiền tố x chỉ ra rằng StaticExtension được tìm thấy trong một trong các không gian tên XAML. Bạn cũng sẽ gặp các tiện ích mở rộng đánh dấu là một phần của không gian tên WPF và không có tiền tố x.
+
+Tất cả các phần mở rộng đánh dấu được thực hiện bởi các lớp có nguồn gốc từ System.Windows.Markup. Đánh dấu Tiện ích mở rộng. Lớp MarkupExtension cơ sở cực kỳ đơn giản — nó cung cấp một phương thức ProvideValue duy nhất nhận được giá trị bạn muốn. Nói cách khác, khi trình phân tích cú pháp XAML gặp câu lệnh trước đó, nó sẽ tạo ra một thể hiện của lớp StaticExtension (truyền vào chuỗi "SystemColors. ActiveCaptionBrush" như một đối số cho hàm tạo) và sau đó gọi ProvideValue() để lấy đối tượng được trả về bởi thuộc tính tĩnh SystemColors.ActiveCaption.Brush. Thuộc tính Foreground của nút cmdAnswer sau đó được đặt với đối tượng được truy xuất.
+
+Kết quả cuối cùng của phần XAML này giống như khi bạn viết điều này:
+
+```csharp
+cmdAnswer.Foreground = SystemColors.ActiveCaptionBrush;
+```
+
+Vì các phần mở rộng đánh dấu ánh xạ đến các lớp, chúng cũng có thể được sử dụng làm thuộc tính lồng nhau, như bạn đã học trong phần trước. Ví dụ: bạn có thể sử dụng StaticExtension với thuộc tính Button.Foreground như sau:
+
+```xaml
+<Button ... >
+    <Button.Foreground>
+        <x:Static Member="SystemColors.ActiveCaptionBrush"></x:Static>
+    </Button.Foreground>
+</Button>
+```
+
+Tùy thuộc vào độ phức tạp của tiện ích mở rộng đánh dấu và số lượng thuộc tính bạn muốn đặt, cú pháp này đôi khi đơn giản hơn.
+
+Giống như hầu hết các tiện ích mở rộng đánh dấu, StaticExtension cần được đánh giá trong thời gian chạy vì chỉ sau đó bạn mới có thể xác định màu hệ thống hiện tại. Một số phần mở rộng đánh dấu có thể được đánh giá tại thời điểm biên dịch. Chúng bao gồm NullExtension (xây dựng một đối tượng đại diện cho kiểu .NET). Trong suốt cuốn sách này, bạn sẽ thấy nhiều ví dụ về các tiện ích mở rộng đánh dấu tại nơi làm việc, đặc biệt là với các tài nguyên và ràng buộc dữ liệu.
+
+### Thuộc tính đính kèm
+
+Cùng với các thuộc tính thông thường, XAML cũng bao gồm khái niệm các thuộc tính đính kèm — các thuộc tính có thể áp dụng cho một số điều khiển nhưng được định nghĩa trong một lớp khác. Trong WPF, các thuộc tính đính kèm thường được sử dụng để kiểm soát bố cục.
+
+Đây là cách nó hoạt động. Mỗi điều khiển đều có tập hợp các thuộc tính nội tại riêng. (Ví dụ: hộp văn bản có phông chữ, màu văn bản và nội dung văn bản cụ thể như được quyết định bởi các thuộc tính như FontFamily, ForeGround và Text.) Khi bạn đặt một điều khiển bên trong một vùng chứa, nó sẽ đạt được các tính năng bổ sung, tùy thuộc vào loại vùng chứa. (Ví dụ: nếu bạn đặt một hộp văn bản bên trong lưới, bạn cần có khả năng chọn ô lưới nơi nó được đặt.) Các chi tiết bổ sung này được đặt bằng cách sử dụng các thuộc tính đính kèm.
+
+Các thuộc tính đính kèm luôn sử dụng tên hai phần trong biểu mẫu này: DefiningType.PropertyName. Cú pháp đặt tên hai phần này cho phép trình phân tích cú pháp XAML phân biệt giữa một thuộc tính bình thường và một thuộc tính đính kèm
+
+Trong ví dụ tám bóng, các thuộc tính đính kèm cho phép các điều khiển riêng lẻ tự đặt mình trên các hàng riêng biệt trong lưới (vô hình):
+
+```xaml
+<TextBox ... Grid.Row="0">
+    [Place question here.]
+</TextBox>
+<Button ... Grid.Row="1">
+    [Ask the Eight Ball]
+</Button>
+<TextBox ... Grid.Row="2">
+    [Answer will appear here.]
+</TextBox>
+```
+
+Các thuộc tính đính kèm hoàn toàn không phải là thuộc tính. Chúng được dịch thành các cuộc gọi phương thức. Bộ phân tích cú pháp XAML gọi phương thức tĩnh có dạng này: DefiningType.SetPropertyName(). Ví dụ: trong đoạn mã XAML trước đó, kiểu xác định là lớp Grid và thuộc tính là Row, vì vậy trình phân tích cú pháp gọi Grid.SetRow()
+
+Khi gọi SetPropertyName(), trình phân tích cú pháp truyền hai tham số: đối tượng đang được sửa đổi và giá trị thuộc tính được chỉ định. Ví dụ: khi bạn đặt thuộc tính Grid.Row trên điều khiển TextBox, bộ phân tích cú pháp XAML thực thi mã này:
+
+```csharp
+Grid.SetRow(txtQuestion, 0);
+```
+
+Mô hình này (gọi một phương pháp tĩnh của loại xác định) là một sự tiện lợi che giấu những gì đang thực sự diễn ra. Đối với mắt thường, mã này ngụ ý rằng số hàng được lưu trữ trong đối tượng Grid. Tuy nhiên, số hàng thực sự được lưu trữ trong đối tượng mà nó áp dụng cho—trong trường hợp này, đối tượng TextBox.
+
+Sự khéo léo này hoạt động vì TextBox bắt nguồn từ lớp cơ sở DependencyObject, cũng như tất cả các điều khiển WPF. Và như bạn sẽ tìm hiểu trong Chương 4, DependencyObject được thiết kế để lưu trữ một bộ sưu tập các thuộc tính phụ thuộc gần như không giới hạn. (Các thuộc tính đính kèm đã được thảo luận trước đó là một loại thuộc tính phụ thuộc đặc biệt.)
+
+Trên thực tế, phương thức Grid.SetRow() là một phím tắt tương đương với việc gọi DependencyObject. Phương thức SetValue(), như được hiển thị ở đây:
+
+```csharp
+txtQuestion.SetValue(Grid.RowProperty, 0);
+```
+
+Các thuộc tính đính kèm là một thành phần cốt lõi của WPF. Chúng hoạt động như một hệ thống mở rộng đa năng. Ví dụ: bằng cách xác định thuộc tính Hàng là thuộc tính đính kèm, bạn đảm bảo rằng thuộc tính này có thể sử dụng được với bất kỳ tùy chọn kiểm soát nào. Tùy chọn khác, làm cho thuộc tính trở thành một phần của lớp cơ sở như FrameworkElement, làm phức tạp cuộc sống. Nó không chỉ làm lộn xộn giao diện công cộng với các thuộc tính chỉ có ý nghĩa trong một số trường hợp nhất định (trong trường hợp này, khi một phần tử đang được sử dụng bên trong Grid), mà còn khiến không thể thêm các loại container mới yêu cầu các thuộc tính mới
+
+### Các yếu tố lồng nhau
+
