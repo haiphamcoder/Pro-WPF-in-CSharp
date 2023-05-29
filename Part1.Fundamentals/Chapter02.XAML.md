@@ -441,4 +441,3 @@ txtQuestion.SetValue(Grid.RowProperty, 0);
 Các thuộc tính đính kèm là một thành phần cốt lõi của WPF. Chúng hoạt động như một hệ thống mở rộng đa năng. Ví dụ: bằng cách xác định thuộc tính Hàng là thuộc tính đính kèm, bạn đảm bảo rằng thuộc tính này có thể sử dụng được với bất kỳ tùy chọn kiểm soát nào. Tùy chọn khác, làm cho thuộc tính trở thành một phần của lớp cơ sở như FrameworkElement, làm phức tạp cuộc sống. Nó không chỉ làm lộn xộn giao diện công cộng với các thuộc tính chỉ có ý nghĩa trong một số trường hợp nhất định (trong trường hợp này, khi một phần tử đang được sử dụng bên trong Grid), mà còn khiến không thể thêm các loại container mới yêu cầu các thuộc tính mới
 
 ### Các yếu tố lồng nhau
-
